@@ -3,7 +3,8 @@
 # collect_nmon_data - A simple script for cron to collect and save nmon performance #
 #                     data on a node.                                               #
 #-----------------------------------------------------------------------------------#
-# Chad Kerner, Senior Systems Engineer                                              #
+# Chad Kerner, ckerner@illinois.edu                                                 #
+# Senior Systems Engineer                                                           #
 # Storage Enabling Technologies                                                     #
 # National Center for Supercomputing Applications                                   #
 # University of Illinois Urbana-Champaign                                           #
