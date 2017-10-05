@@ -1,0 +1,9 @@
+
+
+This package will allow you to cron the collection of nmon performance data.
+
+It also provides some utilities to compress and purge old logs, if you like.
+
+nmon can be downloaded at http://nmon.sourceforge.net
+
+

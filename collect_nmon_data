@@ -1,0 +1,58 @@
+#!/bin/bash
+#===================================================================================#
+# collect_nmon_data - A simple script for cron to collect and save nmon performance #
+#                     data on a node.                                               #
+#-----------------------------------------------------------------------------------#
+# Chad Kerner, Senior Systems Engineer                                              #
+# Storage Enabling Technologies                                                     #
+# National Center for Supercomputing Applications                                   #
+# University of Illinois Urbana-Champaign                                           #
+#===================================================================================#
+
+# Summarize data every minute. Interval specified in seconds.
+INTERVAL=60
+
+# If you wish to get disk statistics grouped by file system, or failure group,
+# or any other logical grouping, place the groups in this file.  For an 
+# example, see diskgroups.sample
+MY_DIR=`dirname $0`
+DISKGROUPS="${MY_DIR}/diskgroups"
+
+# Put your fully qualified nmon binary path here.
+NMON='/usr/local/bin/nmon'
+if [[ ! -x ${NMON} ]] ; then
+   printf "Error: nmon not found: %s\n" ${NMON}
+fi
+
+# Lets set up logging. This is overkill coding, but easy to read.
+LOG_HOST=`hostname -s`
+LOG_BASE="/var/log/nmon"
+LOG_DATE=`date +"%Y%m%d"`
+LOG_YEAR=`date +"%Y"`
+LOG_MONTH=`date +"%m"`
+LOG_DIR="${LOG_BASE}/${LOG_YEAR}/${LOG_MONTH}"
+LOG_FILE="${LOG_DIR}/${LOG_HOST}.${LOG_DATE}"
+
+# If the monthly log file does not exist, create it.
+if [[ ! -d ${LOG_DIR} ]] ; then
+   mkdir -p ${LOG_DIR}
+fi
+
+# Collect for 24 hours unless a log file already exists, then 
+# we must be a restart, so calculate the COUNT based on the INTERVAL
+if [[ -f ${LOG_FILE} ]] ; then
+   CURRENT_HH=`date +"%H"`
+   CURRENT_MM=`date +"%M"`
+   COUNT_H=$((23 - ${CURRENT_HH}))
+   COUNT_M=$((59 - ${CURRENT_MM}))
+   COUNT=$(( (${COUNT_H} * 3600) + (${COUNT_M}*60) / ${INTERVAL} ))
+else
+   COUNT=$(( (24 * 3600) / ${INTERVAL} ))
+fi
+
+if [[ -f ${DISKGROUPS} ]] ; then
+   ${NMON} -F ${LOG_FILE} -t -s${INTERVAL} -c${COUNT} -g ${DISKGROUPS}
+else
+   ${NMON} -F ${LOG_FILE} -t -s${INTERVAL} -c${COUNT} 
+fi
+

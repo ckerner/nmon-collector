@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DAYS_TO_KEEP=30
+LOG_BASE="/var/log/nmon"
+
+find ${LOG_BASE} -mtime +${DAYS_TO_KEEP} | \
+     grep -vE "\.gz" | \
+     while read INFILE 
+        do echo `date`"  Compressing: ${INFILE}"
+        gzip -9 ${INFILE}
+     done

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DAYS_TO_KEEP=30
+LOG_BASE="/var/log/nmon"
+
+find ${LOG_BASE} -mtime +${DAYS_TO_KEEP} | \
+     while read INFILE 
+        do echo `date`"  Removing: ${INFILE}"
+        rm -fv ${INFILE}
+     done
